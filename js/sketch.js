@@ -56,6 +56,25 @@ const config = {
   colourPalette: 11,
   precision: 0.96,
 };
+const cogs = [
+  {
+    cogRadius: 8,
+    holePosition: 95,
+  },
+  {
+    cogRadius: 16,
+    holePosition: 95,
+  },
+  {
+    cogRadius: 32,
+    holePosition: 95,
+  },
+  {
+    cogRadius: 64,
+    holePosition: 95,
+  },
+];
+
 const gui = new dat.GUI();
 const guiFolders = [];
 const buttonHandlers = {
@@ -70,6 +89,11 @@ const buttonHandlers = {
     createGuiForCogs();
     init();
   },
+  removeAllCogs: function () {
+    cogs.length = 0;
+    createGuiForCogs();
+    init();
+  },
   startStop: function () {
     isRunning = !isRunning;
     if (isRunning) {
@@ -79,13 +103,6 @@ const buttonHandlers = {
     }
   },
 };
-
-const cogs = [
-  {
-    cogRadius: 13,
-    holePosition: 88,
-  },
-];
 
 // eslint-disable-next-line no-unused-vars
 function setup() {
@@ -137,18 +154,21 @@ function createTextElement(element, text, x, y, color = textColour) {
 
 function createGui() {
   createTextElement("h1", "Spirograph", 32, 8, textColour);
-  const folder = gui.addFolder("Controls");
+  let folder = gui.addFolder("Actions");
   folder.open();
   folder.add(buttonHandlers, "startStop").name("Start / Stop");
   folder.add(buttonHandlers, "newCog").name("New Cog");
+  folder.add(buttonHandlers, "removeAllCogs").name("Remove All Cogs");
 
-  gui.add(config, "lineWidth", 1, 10, 1).name("Line Width").onChange(noLoop).onFinishChange(init);
-  gui
+  folder = gui.addFolder("Options");
+  folder.open();
+  folder.add(config, "lineWidth", 1, 10, 1).name("Line Width").onChange(noLoop).onFinishChange(init);
+  folder
     .add(config, "colourPalette", 0, lineColourPalettes.length - 1, 1)
     .name("Colour Palette")
     .onChange(noLoop)
     .onFinishChange(init);
-  gui.add(config, "precision", 0.8, 0.99, 0.01).name("Precision").onChange(noLoop).onFinishChange(init);
+  folder.add(config, "precision", 0.8, 0.99, 0.01).name("Precision").onChange(noLoop).onFinishChange(init);
 
   createGuiForCogs();
 }
@@ -160,7 +180,7 @@ function createGuiForCogs() {
     } catch (j) {}
   });
   cogs.forEach(function (penLine, i) {
-    const folder = gui.addFolder(`Cogs ${i + 1}`);
+    const folder = gui.addFolder(`Cog ${i + 1}`);
     folder.add(penLine, "cogRadius", 1, 100, 1).name("Size").onChange(noLoop).onFinishChange(init);
     folder.add(penLine, "holePosition", 1, 100, 1).name("Hole Position").onChange(noLoop).onFinishChange(init);
     folder.add(buttonHandlers, "removeCog").name("Remove Cog");
