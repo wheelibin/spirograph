@@ -1,5 +1,3 @@
-/* globals dat,push,pop,noLoop,loop,strokeWeight,line,tippy,point */
-
 // App constants
 const fps = 60;
 
@@ -227,7 +225,9 @@ function createGuiForCogs() {
   cogGuiFolders.forEach(function (folder) {
     try {
       gui.removeFolder(folder);
-    } catch (j) {}
+    } catch (j) {
+      //ignore
+    }
   });
 
   cogs.forEach(function (penLine, i) {
