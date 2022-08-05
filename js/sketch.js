@@ -1,12 +1,4 @@
-/* globals dat,push,pop,noLoop,loop,strokeWeight,line,tippy */
-
-// extend dat.gui controller to have tooltips
-for (const contoller in dat.controllers) {
-  dat.controllers[contoller].prototype.title = function (title) {
-    this.__li.setAttribute("data-tippy-content", title);
-    return this;
-  };
-}
+/* globals dat,push,pop,noLoop,loop,strokeWeight,line,tippy,point */
 
 // App constants
 const fps = 60;
@@ -47,6 +39,7 @@ const config = {
   drawSpeed: 100,
   precision: 80,
   revolutions: 50,
+  renderMethod: "lines",
 };
 
 const cogs = [
@@ -104,7 +97,13 @@ const buttonHandlers = {
     }
   },
 };
-
+// extend dat.gui controller to have tooltips
+for (const contoller in dat.controllers) {
+  dat.controllers[contoller].prototype.title = function (title) {
+    this.__li.setAttribute("data-tippy-content", title);
+    return this;
+  };
+}
 // eslint-disable-next-line no-unused-vars
 function setup() {
   frameRate(fps);
@@ -150,13 +149,17 @@ function draw() {
 
     const linesToDrawThisFrame = Math.min(config.drawSpeed, cog.points.length - cog.inc);
     for (let i = 0; i < linesToDrawThisFrame; i++) {
-      const prevPoint = cog.inc === 0 ? { x: 0, y: 0 } : cog.points[cog.inc - 1];
-      const point = cog.points[cog.inc];
+      const _point = cog.points[cog.inc];
       push();
       const palette = lineColourPalettes[config.colourPalette - 1];
       stroke(`#${palette[c % palette.length]}`);
       strokeWeight(config.lineWidth);
-      line(prevPoint.x || point.x, prevPoint.y || point.y, point.x, point.y);
+      if (config.renderMethod === "lines") {
+        const prevPoint = cog.inc === 0 ? { x: 0, y: 0 } : cog.points[cog.inc - 1];
+        line(prevPoint.x || _point.x, prevPoint.y || _point.y, _point.x, _point.y);
+      } else {
+        point(_point.x, _point.y);
+      }
       pop();
       cog.inc++;
     }
@@ -180,9 +183,12 @@ function createGui() {
   createTextElement("h1", "Spirograph", 32, 8, textColour);
   let folder = gui.addFolder("Actions");
   folder.open();
-  folder.add(buttonHandlers, "startStop").name("Start / Stop");
   folder.add(buttonHandlers, "newCog").name("New Cog").title("Add a new cog with random settings");
   folder.add(buttonHandlers, "removeAllCogs").name("Remove All Cogs");
+  folder
+    .add(buttonHandlers, "startStop")
+    .name("Start / Stop")
+    .title("Start / Stop the drawing - only really applies when 'Draw Speed' is set very low");
 
   folder = gui.addFolder("Options");
   folder.addColor(config, "paperColour").name("Paper Colour").onChange(noLoop).onFinishChange(init);
@@ -200,7 +206,11 @@ function createGui() {
     .name("Revolutions")
     .title("The number of full revolutions the small cogs make round the outer cog")
     .onChange(init);
-
+  folder
+    .add(config, "renderMethod", ["dots", "lines"])
+    .name("Render Method")
+    .title("dots = render only the calculated points as dots, lines = connect the calculated points with lines")
+    .onChange(init);
   folder.add(config, "lineWidth", 1, 10, 1).name("Line Width").onChange(init);
   folder
     .add(config, "colourPalette", 1, lineColourPalettes.length, 1)
