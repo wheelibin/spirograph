@@ -11,3 +11,7 @@ You can add as many "cogs" as you like and specify the hole position on the cog.
 Massive credit to the article below for simplifying the maths behind plotting the points: 
 
 https://www.physicstomato.com/spirographs/
+
+linspace function taken from here:
+
+https://github.com/NikhilAshodariya/JavaScript_Numpy/blob/master/NumericalRange.js
