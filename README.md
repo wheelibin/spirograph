@@ -6,4 +6,8 @@ A simulation of the popular [Spirograph](https://en.wikipedia.org/wiki/Spirograp
 
 You can add as many "cogs" as you like and specify the hole position on the cog.
 
-Massive credit to this article for simplifying the maths behind plotting the points: https://www.physicstomato.com/spirographs/
+### Credits
+
+Massive credit to the article below for simplifying the maths behind plotting the points: 
+
+https://www.physicstomato.com/spirographs/
